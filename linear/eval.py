@@ -2,7 +2,7 @@ import sys
 sys.path.append('../')
 from model import model
 import torch
-from vars import window_size
+from vars import window_size, signals
 from dataset.dataset import Dataset
 from dataset.parser import get_names
 from sklearn.metrics import average_precision_score
@@ -14,17 +14,16 @@ wandb.init(project="osa", sync_tensorboard=True)
 
 
 
-model = model(n_in=window_size)
+model = model(n_in=window_size*len(signals))
 wandb.watch(model)
-model.load_state_dict(torch.load('model.pt'))
+model.load_state_dict(torch.load('model.pt', map_location=torch.device('cpu')))
 
 names = get_names()
-dataset = Dataset(names[18:], is_training=False, window_size=window_size)
+dataset = Dataset(names[4:5], is_training=False, window_size=window_size, signals=signals)
 dataloader = torch.utils.data.DataLoader(dataset, batch_size=len(dataset),
                                          shuffle=False, num_workers=0)
 (data, target) = zip(*dataloader)
-
-pred = model(data[0])
+pred = model(data[0].view([data[0].shape[0],-1]))
 print(average_precision_score(target[0].data.numpy(),pred.data.numpy()))
 
 writer = SummaryWriter()

@@ -22,34 +22,36 @@ names = [i.lower() for i in names]
 indexes = [i-1 for i in indexes]
 
 
-def parse_file(name):
+def parse_file(name, wanted_signals=['Sound']):
     ind = name[0]
     name = name[1]
-    signals, a, b = highlevel.read_edf(loc+name+'.rec')
-    file1 = open(loc+name+'_respevt.txt',"r") 
+    signals, signal_names, b = highlevel.read_edf(loc+name+'.rec')
+    if 'Soud' not in wanted_signals: wanted_signals.append('Soud')
+    # print(signal_names[6:])
 
+    file1 = open(loc+name+'_respevt.txt',"r")
     lines = file1.readlines()[3:-2]
 
-    sound = signals[7]
-    label = np.zeros(sound.shape)
+    indexes = [a for (a,b) in enumerate(signal_names) if b['label'] in wanted_signals]
 
+    assert len(indexes) == len(wanted_signals)-1
+    data = np.array(signals)[indexes]
+    data = np.array([np.array(a) for a in data])
+
+    label = np.zeros(data.shape[1])
     for l in lines:
         st = _time_sec(l) - start_time[ind]
         duration = int(l[28:30])
         label[st*8:st*8+duration*8].fill(1)
 
-    return sound, label
+    return data, label
 
 def get_names():
     return list(enumerate(names))
 
 
-
-
-
-
-
-
+# names = get_names()
+# parse_file(names[1])
 
 
 
