@@ -8,7 +8,7 @@ def _time_sec(a):
     a = a.replace(':','')
     if len(a) < 6:
         a = '0'+a
-    res = 360*int(a[:2]) + 60*int(a[2:4]) + int(a[4:6])
+    res = 3600*int(a[:2]) + 60*int(a[2:4]) + int(a[4:6])
     return res
 
 loc = "../../data/stvinc/"
@@ -39,8 +39,14 @@ def parse_file(name, wanted_signals=['Sound']):
     data = np.array([np.array(a) for a in data])
 
     label = np.zeros(data.shape[1])
+    day = 24*60*60
+
     for l in lines:
-        st = _time_sec(l) - start_time[ind]
+        occ = _time_sec(l)
+        if occ >= start_time[ind]:
+            st = occ - start_time[ind]
+        else:
+            st = day-start_time[ind]+occ
         duration = int(l[28:30])
         label[st*8:st*8+duration*8].fill(1)
 

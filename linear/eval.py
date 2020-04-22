@@ -14,12 +14,12 @@ wandb.init(project="osa", sync_tensorboard=True)
 
 
 
-model = model(n_in=window_size*len(signals))
+model = model(n_in=window_size*len(signals), n_hidden=200)
 wandb.watch(model)
-model.load_state_dict(torch.load('model.pt', map_location=torch.device('cpu')))
+model.load_state_dict(torch.load('model.pt'))
 
 names = get_names()
-dataset = Dataset(names[4:5], is_training=False, window_size=window_size, signals=signals)
+dataset = Dataset(names[18:], is_training=False, window_size=window_size, signals=signals)
 dataloader = torch.utils.data.DataLoader(dataset, batch_size=len(dataset),
                                          shuffle=False, num_workers=0)
 (data, target) = zip(*dataloader)

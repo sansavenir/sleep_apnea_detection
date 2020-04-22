@@ -38,13 +38,15 @@ class Dataset(Dataset):
     def get_weights(self):
       nz = np.count_nonzero(self.target)
       return [self.target.shape[0]-nz, nz]
+
     def _one_hot(self,x):
       if x == 0.:
         return [1,0]
       else:
         return [0,1]
+
     def __len__(self):
-        return len(self.x)
+        return self.y.shape[0]
 
     def __getitem__(self, idx):
         if torch.is_tensor(idx):
